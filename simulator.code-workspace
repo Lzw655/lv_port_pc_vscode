@@ -26,8 +26,19 @@
 		"cmake.configureOnOpen": true,
 		"files.associations": {
 			"glob.h": "c",
-			"lvgl.h": "c"
+			"lvgl.h": "c",
+			"array": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"ranges": "cpp",
+			"lv_custom_keyboard_private.h": "c"
 		},
+		// "clangd.arguments": [
+		// 	"--compile-commands-dir=components/esp-brookesia/examples/speaker_s3_sparkle/build"
+		// ]
+		"clangd.arguments": [
+			"--compile-commands-dir=build"
+		]
 	},
 	// tasks.json section
 	"tasks": {
@@ -35,10 +46,16 @@
 		"tasks": [
 			{
 				"label": "Build",
-				"command": "cmake",
-				"args": [
-					"--build", "${command:cmake.buildDirectory}"
-				],
+                "type": "shell",
+                "windows": {
+                    "command": "cmake.exe -G 'MinGW Makefiles' -B ./build; mingw32-make.exe -C ./build",
+                },
+                "linux": {
+                    "command": "cmake -B ./build && make -C ./build",
+                },
+                "osx": {
+                    "command": "cmake -B ./build && arch -x86_64 make -C ./build",
+                },
 				"group": {
 					"kind": "build",
 					"isDefault": true
@@ -90,7 +107,7 @@
 				  },
 				  "windows": {
 					"MIMode": "gdb",
-					"miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+					"miDebuggerPath": "C:\\msys64\\mingw64\\bin\\gdb.exe"
 				  }
 			},
 			{

@@ -7,3 +7,15 @@
 [submodule "FreeRTOS"]
 	path = FreeRTOS
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "esp-brookesia"]
+	path = esp-brookesia
+	url = https://github.com/espressif/esp-brookesia.git
+[submodule "components/esp-brookesia"]
+	path = components/esp-brookesia
+	url = https://github.com/espressif/esp-brookesia.git
+[submodule "components/esp-lib-utils"]
+	path = components/esp-lib-utils
+	url = https://github.com/esp-arduino-libs/esp-lib-utils.git
+[submodule "components/esp-brookesia-apps"]
+	path = components/esp-brookesia-apps
+	url = https://github.com/esp-arduino-libs/esp-brookesia-apps.git

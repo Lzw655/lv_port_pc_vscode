@@ -1,4 +1,3 @@
-
 /**
  * @file main
  *
@@ -7,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #define _DEFAULT_SOURCE /* needed for usleep() */
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,10 +15,17 @@
 #include "lvgl/lvgl.h"
 #include "lvgl/examples/lv_examples.h"
 #include "lvgl/demos/lv_demos.h"
+#if __has_include("esp_brookesia.hpp")
+#include <mutex>
+#include "esp_brookesia.hpp"
+#define USE_ESP_BROOKESIA
+#endif
 
 /*********************
  *      DEFINES
  *********************/
+#define DISP_HOR_RES  360
+#define DISP_VER_RES  360
 
 /**********************
  *      TYPEDEFS
@@ -42,6 +49,8 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
  **********************/
 
 extern void freertos_main(void);
+extern int brookesia_speaker_init(int hor_res, int ver_res, esp_brookesia::gui::LockCallback lock_callback, esp_brookesia::gui::UnlockCallback unlock_callback);
+extern void brookesia_speaker_init(int hor_res, int ver_res);
 
 /*********************
  *      DEFINES
@@ -63,7 +72,7 @@ extern void freertos_main(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-int main(int argc, char **argv)
+extern "C" int main(int argc, char **argv)
 {
   (void)argc; /*Unused*/
   (void)argv; /*Unused*/
@@ -72,16 +81,38 @@ int main(int argc, char **argv)
   lv_init();
 
   /*Initialize the HAL (display, input devices, tick) for LVGL*/
-  hal_init(320, 480);
+  hal_init(DISP_HOR_RES, DISP_VER_RES);
+
+  std::recursive_timed_mutex lock_mutex;
+
+#if defined(USE_ESP_BROOKESIA)
+# if ESP_BROOKESIA_CONF_SYSTEMS_ENABLE_PHONE
+    brookesia_phone_init(DISP_HOR_RES, DISP_VER_RES);
+# elif ESP_BROOKESIA_CONF_SYSTEMS_ENABLE_SPEAKER
+    brookesia_speaker_init(DISP_HOR_RES, DISP_VER_RES, [&](int timeout_ms) {
+        auto timeout = timeout_ms == 0 ? std::chrono::hours(24) : std::chrono::milliseconds(timeout_ms);
+        if (lock_mutex.try_lock_for(timeout)) {
+            return true;
+        }
+        return false;
+    }, [&]() {
+        lock_mutex.unlock();
+    });
+# endif // ESP_BROOKESIA_CONF_SYSTEMS_ENABLE_PHONE
+#endif // USE_ESP_BROOKESIA
 
   #if LV_USE_OS == LV_OS_NONE
 
+#if !defined(USE_ESP_BROOKESIA)
   lv_demo_widgets();
+#endif
 
   while(1) {
     /* Periodically call the lv_task handler.
      * It could be done in a timer interrupt or an OS task too.*/
+    lock_mutex.lock();
     lv_timer_handler();
+    lock_mutex.unlock();
     usleep(5 * 1000);
   }
 

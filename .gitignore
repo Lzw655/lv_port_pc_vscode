@@ -10,3 +10,5 @@ ui/
 
 # VSCode
 .vscode
+
+.clangd
