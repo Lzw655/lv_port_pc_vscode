@@ -7,3 +7,6 @@
 [submodule "FreeRTOS"]
 	path = FreeRTOS
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "esp-brookesia"]
+	path = esp-brookesia
+	url = ssh://git@gitlab.espressif.cn:27227/ae_group/esp-brookesia.git

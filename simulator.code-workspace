@@ -35,10 +35,8 @@
 		"tasks": [
 			{
 				"label": "Build",
-				"command": "cmake",
-				"args": [
-					"--build", "${command:cmake.buildDirectory}"
-				],
+				"type": "shell",
+				"command": "mkdir -p build && cd build && cmake .. && make",
 				"group": {
 					"kind": "build",
 					"isDefault": true
@@ -105,5 +103,5 @@
 				"MIMode": "lldb"
 			},
 		],
-	},
+	}
 }
