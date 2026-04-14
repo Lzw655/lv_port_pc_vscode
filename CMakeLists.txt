@@ -77,7 +77,7 @@ add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
 
 # Add esp-brookesia subdirectory
-add_subdirectory(esp-brookesia/utils/brookesia_lib_utils)
+add_subdirectory(esp-brookesia)
 
 # Create the main executable, depending on the FreeRTOS option
 if(USE_FREERTOS)
@@ -100,15 +100,16 @@ endif()
 # Define LVGL configuration as a simple include
 target_compile_definitions(main PRIVATE LV_CONF_INCLUDE_SIMPLE)
 
-# Set C++20 standard for main executable (required for brookesia_lib_utils)
+# Set C++23 standard for main executable so all supported Brookesia PC modules
+# can be used directly from the simulator target.
 set_target_properties(main PROPERTIES
-    CXX_STANDARD 20
+    CXX_STANDARD 23
     CXX_STANDARD_REQUIRED ON
 )
 
 target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} m pthread)
 
-target_link_libraries(main brookesia_lib_utils)
+target_link_libraries(main brookesia::all)
 
 # Only link freertos_config if the FreeRTOS directory exists
 if(USE_FREERTOS)

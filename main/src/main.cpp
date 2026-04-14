@@ -13,11 +13,18 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "lvgl/lvgl.h"
+#if LV_BUILD_EXAMPLES
 #include "lvgl/examples/lv_examples.h"
+#endif
+#if LV_BUILD_DEMOS
 #include "lvgl/demos/lv_demos.h"
+#endif
 #include "glob.h"
 
 #include "brookesia/lib_utils.hpp"
+#include "brookesia/hal_interface.hpp"
+
+using namespace esp_brookesia;
 
 /*********************
  *      DEFINES
@@ -71,8 +78,6 @@ int main(int argc, char **argv)
   (void)argc; /*Unused*/
   (void)argv; /*Unused*/
 
-  BROOKESIA_LOGI("Hello, World!");
-
   /*Initialize LVGL*/
   lv_init();
 
@@ -81,7 +86,9 @@ int main(int argc, char **argv)
 
   #if LV_USE_OS == LV_OS_NONE
 
+#if LV_USE_DEMO_WIDGETS
   lv_demo_widgets();
+#endif
 
   while(1) {
     /* Periodically call the lv_task handler.
